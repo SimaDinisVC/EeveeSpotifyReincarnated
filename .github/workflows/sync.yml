@@ -5,7 +5,6 @@ on:
     - cron: '0 0 * * *' # Corre todos os dias à meia-noite
   workflow_dispatch: # Permite-te clicar no botão para sincronizar manualmente
 
-# Garante que a Action tem permissão para gravar no teu repositório
 permissions:
   contents: write
 
@@ -13,15 +12,15 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      # Passo obrigatório para preparar a pasta de trabalho
       - name: Checkout target repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Força o download de todas as branches e histórico
 
-      # Corre a sincronização através da ferramenta do Marketplace
       - name: Sync upstream changes
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
-          target_sync_branch: main
+          target_sync_branch: master # AJUSTADO: mudado de 'main' para 'master'
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-          upstream_sync_branch: main
+          upstream_sync_branch: master # AJUSTADO: mudado de 'main' para 'master'
           upstream_sync_repo: SideloadLabs/EeveeSpotifyReincarnated
