@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # Descarrega todo o histórico para evitar erros de falta de referências
 
       - name: Sincronizar com o Upstream
         run: |
@@ -25,12 +26,21 @@ jobs:
           # Adiciona o repositório original correto
           git remote add upstream https://github.com
           
-          # Descarrega as novidades
+          # Descarrega as novidades do original
           git fetch upstream
-          git checkout main
           
-          # Junta as alterações (tenta Fast-Forward, se não der, faz um merge normal)
-          git merge upstream/main --ff-only || git merge upstream/main -m "Merge upstream changes"
+          # DETEÇÃO AUTOMÁTICA: Descobre se a branch principal é main ou master
+          if git show-ref --verify --quiet refs/heads/main; then
+            BRANCH="main"
+          else
+            BRANCH="master"
+          fi
           
-          # Envia para o teu fork
-          git push origin main
+          echo "A branch ativa detetada é: $BRANCH"
+          git checkout $BRANCH
+          
+          # Junta as alterações de forma segura
+          git merge upstream/$BRANCH --ff-only || git merge upstream/$BRANCH -m "Merge upstream changes" --allow-unrelated-histories
+          
+          # Envia a atualização para o teu fork
+          git push origin $BRANCH
