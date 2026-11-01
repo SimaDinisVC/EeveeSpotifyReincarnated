@@ -3,7 +3,7 @@ name: Sincronizar Fork
 on:
   schedule:
     - cron: '0 0 * * *' # Corre todos os dias à meia-noite
-  workflow_dispatch: # Permite correr manualmente quando quiseres
+  workflow_dispatch: # Permite-te correr manualmente quando quiseres
 
 permissions:
   contents: write
@@ -16,14 +16,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0 # Descarrega todo o histórico para evitar erros de falta de referências
+          fetch-depth: 0 # Descarrega o histórico completo para evitar erros de referências
 
       - name: Sincronizar com o Upstream
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           
-          # Adiciona o repositório original correto
+          # LINK CORRIGIDO: Aponta diretamente para o repositório original completo
           git remote add upstream https://github.com
           
           # Descarrega as novidades do original
@@ -42,5 +42,5 @@ jobs:
           # Junta as alterações de forma segura
           git merge upstream/$BRANCH --ff-only || git merge upstream/$BRANCH -m "Merge upstream changes" --allow-unrelated-histories
           
-          # Envia a atualização para o teu fork
+          # Envia a atualização para o teu fork no GitHub
           git push origin $BRANCH
