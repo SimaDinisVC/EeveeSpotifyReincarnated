@@ -1,9 +1,9 @@
-name: Sync Fork
+name: Sincronizar Fork
 
 on:
   schedule:
     - cron: '0 0 * * *' # Corre todos os dias à meia-noite
-  workflow_dispatch: # Permite-te clicar no botão para sincronizar manualmente
+  workflow_dispatch: # Permite-te correr manualmente se quiseres
 
 permissions:
   contents: write
@@ -12,13 +12,18 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout target repo
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Sync upstream changes
-        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
-          target_sync_branch: main
-          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-          upstream_sync_branch: main
-          upstream_sync_repo: SideloadLabs/EeveeSpotifyReincarnated
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sincronizar com o Upstream
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          # Substitui pelo URL do repositório original (don@/repo-original.git)
+          git remote add upstream https://github.com
+          git fetch upstream
+          git checkout main # ou master
+          git merge upstream/main --ff-only
+          git push origin main
