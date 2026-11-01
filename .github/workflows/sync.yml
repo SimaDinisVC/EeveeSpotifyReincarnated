@@ -21,8 +21,8 @@ jobs:
       - name: Sync upstream changes
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
-          target_sync_branch: main # Garante que coincide com o ref acima
+          target_sync_branch: Master # Garante que coincide com o ref acima
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-          upstream_sync_branch: main
+          upstream_sync_branch: Master
           upstream_sync_repo: SideloadLabs/EeveeSpotifyReincarnated
           test_mode: false # Garante que ele efetivamente faz o push e grava
