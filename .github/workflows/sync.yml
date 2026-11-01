@@ -1,10 +1,11 @@
-name: Sincronizar Fork
+name: Sync Fork
 
 on:
   schedule:
     - cron: '0 0 * * *' # Corre todos os dias à meia-noite
-  workflow_dispatch: # Permite-te correr manualmente quando quiseres
+  workflow_dispatch: # Permite-te clicar no botão para sincronizar manualmente
 
+# Garante que a Action tem permissão para gravar no teu repositório
 permissions:
   contents: write
 
@@ -12,35 +13,15 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      # Passo obrigatório para preparar a pasta de trabalho
+      - name: Checkout target repo
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0 # Descarrega o histórico completo para evitar erros de referências
 
-      - name: Sincronizar com o Upstream
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          
-          # LINK CORRIGIDO: Aponta diretamente para o repositório original completo
-          git remote add upstream https://github.com
-          
-          # Descarrega as novidades do original
-          git fetch upstream
-          
-          # DETEÇÃO AUTOMÁTICA: Descobre se a branch principal é main ou master
-          if git show-ref --verify --quiet refs/heads/main; then
-            BRANCH="main"
-          else
-            BRANCH="master"
-          fi
-          
-          echo "A branch ativa detetada é: $BRANCH"
-          git checkout $BRANCH
-          
-          # Junta as alterações de forma segura
-          git merge upstream/$BRANCH --ff-only || git merge upstream/$BRANCH -m "Merge upstream changes" --allow-unrelated-histories
-          
-          # Envia a atualização para o teu fork no GitHub
-          git push origin $BRANCH
+      # Corre a sincronização através da ferramenta do Marketplace
+      - name: Sync upstream changes
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
+        with:
+          target_sync_branch: main
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          upstream_sync_branch: main
+          upstream_sync_repo: SideloadLabs/EeveeSpotifyReincarnated
